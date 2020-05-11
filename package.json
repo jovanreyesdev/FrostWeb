@@ -12,9 +12,13 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
+    "node-sass": "^4.14.1",
     "react": "^16.13.1",
+    "react-datepicker": "^2.15.0",
     "react-dom": "^16.13.1",
+    "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
+    "sass-lint": "^1.13.1",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.88.2"
   },
@@ -23,6 +27,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "lint-es": "eslint --color --fix --ext .jsx --ext .js .",
+    "lint-scss": "sass-lint **/*.scss --verbose",
     "flow": "flow"
   },
   "eslintConfig": {

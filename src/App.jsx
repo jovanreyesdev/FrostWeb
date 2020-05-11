@@ -1,24 +1,17 @@
 import React from 'react';
-import { Button } from 'semantic-ui-react';
-import logo from './logo.svg';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+} from 'react-router-dom';
 import './app.css';
+import SourcesPage from './pages/sources';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit
-          {' '}
-          <code>src/App.js</code>
-          {' '}
-          and save to reload.
-        </p>
-        <Button>Learn React</Button>
-      </header>
-    </div>
-  );
-}
-
-export default App;
+export default () => (
+  <Router>
+    <Switch>
+      <Route path="/sources" component={SourcesPage} exact />
+      <Route path="/sources/:sourceId" component={SourcesPage} exact />
+    </Switch>
+  </Router>
+);

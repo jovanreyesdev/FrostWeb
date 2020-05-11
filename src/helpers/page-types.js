@@ -1,0 +1,4 @@
+export default {
+  LIST: 'LIST',
+  VIEW_OBSERVATIONS: 'VIEW_OBSERVATIONS',
+};

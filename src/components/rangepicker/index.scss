@@ -1,0 +1,23 @@
+.date-range-picker {
+  -ms-flex: 1 0 auto;
+  -webkit-box-flex: 1;
+  -webkit-box-shadow: none;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  -webkit-transition: border-color 0.1s ease, -webkit-box-shadow 0.1s ease;
+  background: #fff;
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  border-radius: 0.28571429rem;
+  box-shadow: none;
+  color: rgba(0, 0, 0, 0.87);
+  flex: 1 0 auto;
+  font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
+  line-height: 1.21428571em;
+  margin: 0 1rem 0 0;
+  max-width: 100%;
+  outline: 0;
+  padding: 0.67857143em 1em;
+  text-align: left;
+  transition: border-color 0.1s ease,-webkit-box-shadow 0.1s ease;
+  transition: box-shadow 0.1s ease,border-color 0.1s ease;
+  transition: box-shadow 0.1s ease,border-color 0.1s ease,-webkit-box-shadow 0.1s ease;
+}
