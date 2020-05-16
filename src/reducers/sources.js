@@ -7,7 +7,7 @@ import actions from '../store/sources/actions';
 
 type reducerParam = {
   type: string,
-  payload: Object,
+  payload: string | number | boolean | Object,
 };
 
 export default (
@@ -15,22 +15,20 @@ export default (
   { type, payload }: reducerParam,
 ): IState<ISource> => {
   switch (type) {
-    case actions.GET_SOURCES: {
+    case actions.GET_ALL_SOURCES: {
       return startFetch(state);
     }
-    case actions.SET_SOURCES: {
+    case actions.SET_SOURCE_LIST: {
       return setList(state, payload);
     }
-    case actions.SELECT_SOURCE: {
+    case actions.GET_SOURCE: {
+      return startFetch(state);
+    }
+    case actions.SET_CURRENT_SOURCE: {
       return {
         ...state,
         current: payload,
-      };
-    }
-    case actions.SET_PAGE_MODE: {
-      return {
-        ...state,
-        pageMode: payload,
+        fetching: false,
       };
     }
     default:

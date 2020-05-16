@@ -1,0 +1,16 @@
+.main-container {
+  min-height: calc(100vh - 110px);
+  padding-top: 3rem;
+  width: 100%;
+
+  .source-list {
+    margin-top: 2rem;
+    width: 100%;
+  }
+
+  .ui {
+    &.list > .item {
+      padding: 1rem 0;
+    }
+  }
+}

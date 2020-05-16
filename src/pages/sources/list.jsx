@@ -1,44 +1,48 @@
 // @flow
 
 import React from 'react';
-import { Header, Table } from 'semantic-ui-react';
+import {
+  Header, Button, List,
+} from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
 import { ISource } from '../../store/sources/types';
-import { SelectSourceButton } from '../../components/buttons';
 
 type SourceListProps = {
   sources: ISource[];
-  onSelect: (source: ISource) => void;
 }
 
-export default ({ sources, onSelect }: SourceListProps) => (
-  <Table selectable celled striped>
-    <Table.Header>
-      <Table.Row>
-        <Table.HeaderCell>Sources</Table.HeaderCell>
-        <Table.HeaderCell width="2" />
-      </Table.Row>
-    </Table.Header>
-    <Table.Body>
+export default ({ sources }: SourceListProps) => (
+  <>
+    <Header.Content as="h1">
+      SOURCES
+      <Header.Subheader as="h3">
+        Municipality: HALDEN
+      </Header.Subheader>
+    </Header.Content>
+    <List divided verticalAlign="middle" className="source-list">
       {
         sources.map((s) => (
-          <Table.Row>
-            <Table.Cell collapsing width="14">
+          <List.Item>
+            <List.Content floated="right">
+              <Button
+                size="tiny"
+                as={Link}
+                to={`/source/${s.id}`}
+              >
+                View Observations
+              </Button>
+            </List.Content>
+            <List.Content>
               <Header.Content>
                 {s.name}
                 <Header.Subheader>
                   {s.shortName}
                 </Header.Subheader>
               </Header.Content>
-            </Table.Cell>
-            <Table.Cell collapsing width="14">
-              <SelectSourceButton
-                onSelect={onSelect}
-                source={s}
-              />
-            </Table.Cell>
-          </Table.Row>
+            </List.Content>
+          </List.Item>
         ))
       }
-    </Table.Body>
-  </Table>
+    </List>
+  </>
 );

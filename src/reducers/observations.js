@@ -7,7 +7,7 @@ import actions from '../store/observations/actions';
 
 type reducerParam = {
   type: string,
-  payload: Object,
+  payload: string | number | boolean | Object,
 };
 
 export default (

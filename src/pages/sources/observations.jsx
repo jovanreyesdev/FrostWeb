@@ -1,27 +1,53 @@
 // @flow
-import React, { useState, useReducer } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import {
   Grid, Header, Loader,
   Dimmer, Button,
 } from 'semantic-ui-react';
+
 import RangePicker from '../../components/rangepicker';
-import actions from '../../store/observations/actions';
-import { ISource } from '../../store/sources/types';
+import ObservationTable from '../../components/observation-table';
+
+import sActions from '../../store/sources/actions';
+import oActions from '../../store/observations/actions';
+import { getSource } from '../../services/sources';
 import { getObservations } from '../../services/observations';
-import { toYMDFormat } from '../../helpers/date';
+import displayMode from '../../helpers/display-modes';
+import { toYMDFormat, compare } from '../../utils/date';
 import { initialState } from '../../store/common';
+import sourcesReducer from '../../reducers/sources';
 import observationsReducer from '../../reducers/observations';
 
-type Props = {
-  source: ISource;
-}
+const { GET_SOURCE, SET_CURRENT_SOURCE } = sActions;
+const { GET_OBSERVATIONS, SET_OBSERVATIONS } = oActions;
 
-const { GET_OBSERVATIONS, SET_OBSERVATIONS } = actions;
+export default () => {
+  const [source, sDispatch] = useReducer(sourcesReducer, initialState);
+  const [observations, oDispatch] = useReducer(observationsReducer, initialState);
 
+  const params = useParams();
 
-export default ({ source }: Props) => {
-  const [observations, dispatch] = useReducer(observationsReducer, initialState);
+  const { sourceId } = params;
 
+  useEffect(() => {
+    const execute = async () => {
+      sDispatch({
+        type: GET_SOURCE,
+      });
+
+      const response = await getSource(sourceId);
+
+      sDispatch({
+        type: SET_CURRENT_SOURCE,
+        payload: response.data.data[0],
+      });
+    };
+
+    execute();
+  }, []);
+
+  const [mode, setMode] = useState('');
   const [dateRange, setDateRange] = useState({
     start: new Date(),
     end: new Date(),
@@ -29,7 +55,7 @@ export default ({ source }: Props) => {
 
   const clickGetObservations = () => {
     const execute = async () => {
-      dispatch({
+      oDispatch({
         type: GET_OBSERVATIONS,
       });
 
@@ -37,11 +63,16 @@ export default ({ source }: Props) => {
       const end = toYMDFormat(dateRange.end);
 
       const response = await getObservations({
-        sourceId: source.id,
+        sourceId,
         range: `${start}/${end}`,
       });
 
-      dispatch({
+      const display = compare(dateRange.start, dateRange.end)
+        ? displayMode.HOURLY : displayMode.DAILY;
+
+      setMode(display);
+
+      oDispatch({
         type: SET_OBSERVATIONS,
         payload: response.data.data,
       });
@@ -57,60 +88,73 @@ export default ({ source }: Props) => {
     });
   };
 
-  const changesEndDate = (date) => {
+  const changeEndDate = (date) => {
     setDateRange({
       ...dateRange,
       end: date,
     });
   };
 
+  const hasCurrent = !!source.current;
+  let name = '';
+  let shortName = '';
+  let municipality = '';
+
+
+  if (hasCurrent) {
+    ({ name, shortName, municipality } = source.current);
+  }
+
   return (
     <>
-      <Grid style={{ width: '100%', margin: '0 auto', maxWidth: '90rem' }}>
-        <Grid.Column>
-          <Grid padded>
-            <Button
-              content="Back"
-              icon="left arrow"
-              labelPosition="left"
-              style={{ marginLeft: '1rem' }}
-            />
-          </Grid>
-          <Grid padded>
-            <Grid.Column
-              divided="vertically"
-            >
-              <Grid.Row style={{ display: 'flex' }}>
-                <Grid.Column>
-                  <Header as="h2">
-                    <Header.Content>
-                      {source.name}
-                    </Header.Content>
-                  </Header>
-                  <p>
-                    Short Name:&nbsp;
-                    <b>{source.shortName}</b>
-                  </p>
-                  <p>
-                    Municipality:&nbsp;
-                    <b>{source.municipality}</b>
-                  </p>
-                </Grid.Column>
-                <Grid.Column style={{ marginLeft: 'auto' }}>
-                  <RangePicker
-                    start={dateRange.start}
-                    end={dateRange.end}
-                    onStartChange={changeStartDate}
-                    onEndChange={changesEndDate}
-                  />
-                  <Button onClick={clickGetObservations}>Filter</Button>
-                </Grid.Column>
-              </Grid.Row>
-            </Grid.Column>
-          </Grid>
-        </Grid.Column>
-      </Grid>
-      <Dimmer active={observations.fetching} inverted>
+      <Grid.Column style={{ width: '100%' }}>
+        <Grid padded>
+          <Button
+            content="Back"
+            icon="left arrow"
+            labelPosition="left"
+            as={Link}
+            to="/sources"
+          />
+        </Grid>
+        <Grid padded style={{ paddingBottom: '3rem' }}>
+          <Grid.Column
+            divided="vertically"
+          >
+            <Grid.Row style={{ display: 'flex' }}>
+              <Grid.Column>
+                <Header as="h2">
+                  <Header.Content>
+                    {name}
+                  </Header.Content>
+                </Header>
+                <p>
+                  Short Name:&nbsp;
+                  <b>{shortName}</b>
+                </p>
+                <p>
+                  Municipality:&nbsp;
+                  <b>{municipality}</b>
+                </p>
+              </Grid.Column>
+              <Grid.Column style={{ marginLeft: 'auto' }}>
+                <RangePicker
+                  start={dateRange.start}
+                  end={dateRange.end}
+                  onStartChange={changeStartDate}
+                  onEndChange={changeEndDate}
+                />
+                <Button onClick={clickGetObservations}>Filter</Button>
+              </Grid.Column>
+            </Grid.Row>
+          </Grid.Column>
+        </Grid>
+        <ObservationTable
+          data={observations.list}
+          display={mode}
+        />
+      </Grid.Column>
+      <Dimmer active={source.fetching || observations.fetching} inverted>
         <Loader size="large">Loading</Loader>
       </Dimmer>
     </>
