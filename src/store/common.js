@@ -12,13 +12,12 @@ export const initialState = {
 };
 
 export const startFetch = <T>(state: IState<T>): IState<T> => ({
-  ...state,
+  list: state.list,
   fetching: true,
 });
 
 export const setList = <T>(state: IState<T>,
   list: T[]): IState<T> => ({
-    ...state,
     list,
     fetching: false,
   });

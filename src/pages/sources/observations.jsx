@@ -15,7 +15,9 @@ import { getSource } from '../../services/sources';
 import { getObservations } from '../../services/observations';
 import displayMode from '../../helpers/display-modes';
 import { toYMDFormat, compare } from '../../utils/date';
-import { initialState } from '../../store/common';
+import { IState, initialState } from '../../store/common';
+import { ISource } from '../../store/sources/types';
+import { IObservationData } from '../../store/observations/types';
 import sourcesReducer from '../../reducers/sources';
 import observationsReducer from '../../reducers/observations';
 
@@ -23,8 +25,9 @@ const { GET_SOURCE, SET_CURRENT_SOURCE } = sActions;
 const { GET_OBSERVATIONS, SET_OBSERVATIONS } = oActions;
 
 export default () => {
-  const [source, sDispatch] = useReducer(sourcesReducer, initialState);
-  const [observations, oDispatch] = useReducer(observationsReducer, initialState);
+  const [source, sDispatch] = useReducer(sourcesReducer, (initialState: IState<ISource>));
+  const [observations, oDispatch] = useReducer(observationsReducer,
+    (initialState: IState<IObservationData>));
 
   const params = useParams();
 

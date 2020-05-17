@@ -3,22 +3,21 @@ import React from 'react';
 import { Table } from 'semantic-ui-react';
 
 import { toYMDFormat } from '../../utils/date';
-import { getHighestValue } from '../../utils/array';
+import { getHighestValue, filterByElement, findByElement } from '../../utils/array';
 import displayMode from '../../helpers/display-modes';
 import Elements from '../../helpers/elements';
 import { IObservationData, IObservation } from '../../store/observations/types';
 
-import AirTemperatureHeader from './components/air-temperature/header';
-import WindSpeedHeader from './components/wind-speed/header';
-import WeatherConditionRow from './components/weather-condition';
-import DataRow from './components/row';
+import TemperatureHeader from './components/headers/temp';
+import WindSpeedHeader from './components/headers/wind';
+import DataRow from './components/data-row';
 
-type Props = {
+type ObservationTableProps = {
   data: IObservationData[];
   display: string;
 }
 
-export default ({ data, display }: Props) => {
+export default ({ data, display }: ObservationTableProps) => {
   let observationData = data;
 
   if (display === displayMode.DAILY) {
@@ -43,7 +42,7 @@ export default ({ data, display }: Props) => {
           </Table.HeaderCell>
         </Table.Row>
         <Table.Row>
-          <AirTemperatureHeader />
+          <TemperatureHeader />
           <WindSpeedHeader />
           <Table.HeaderCell>
             Sunny
@@ -55,38 +54,28 @@ export default ({ data, display }: Props) => {
       </Table.Header>
       <Table.Body>
         {observationData.map((d) => {
-          const tempObservations: IObservation[] = d.observations
-            .filter((o) => o.elementId === Elements.AIR_TEMPERATURE);
+          const temp: IObservation[] = filterByElement(d.observations, Elements.AIR_TEMPERATURE);
+          const wind: IObservation[] = filterByElement(d.observations, Elements.WIND_SPEED);
+          const weather = findByElement(d.observations, Elements.WEATHER_CONDITION);
 
-          const windObservations: IObservation[] = d.observations
-            .filter((o) => o.elementId === Elements.WIND_SPEED);
-
-          const weatherCondition = d.observations
-            .find((o) => o.elementId === Elements.WEATHER_CONDITION);
-
-          const hasWeatherCondition = weatherCondition !== undefined;
-          const length = getHighestValue([windObservations.length,
-            tempObservations.length]);
-          const rows = new Array(length).fill(0);
+          const weatherValue = weather !== undefined ? weather.value : -1;
+          const length = getHighestValue([wind.length, temp.length]);
+          const rowSpan = length + 1;
 
           return (
             <>
               <Table.Row key={d.sourceId}>
-                <Table.Cell rowSpan={rows.length + 1}>
+                <Table.Cell rowSpan={rowSpan}>
                   {toYMDFormat(d.referenceTime)}
                 </Table.Cell>
               </Table.Row>
-              {
-                rows.map((o, i) => (
-                  <Table.Row>
-                    <DataRow data={tempObservations[i]} />
-                    <DataRow data={windObservations[i]} />
-                    <WeatherConditionRow
-                      value={hasWeatherCondition ? weatherCondition.value : -1}
-                    />
-                  </Table.Row>
-                ))
-              }
+              <DataRow
+                rows={length}
+                rowSpan={rowSpan}
+                tempObservations={temp}
+                windObservations={wind}
+                weatherObservations={weatherValue}
+              />
             </>
           );
         })}
